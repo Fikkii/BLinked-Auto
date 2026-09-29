@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="512" cy="380" r="160" fill="#334155" stroke="url(#accent)" stroke-width="4"/>
+  <!-- User Silhouette -->
+  <circle cx="512" cy="330" r="60" fill="#94a3b8"/>
+  <path d="M432 460 C432 400, 592 400, 592 460 Z" fill="#94a3b8"/>
+  <!-- Badge -->
+  <rect x="362" y="580" width="300" height="40" rx="20" fill="url(#accent)"/>
+  <text x="512" y="606" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="middle">
+    QWEN-IMAGE-3.0 • STANDBY REFERENCE
+  </text>
+  <!-- Prompt Card -->
+  <rect x="112" y="650" width="800" height="240" rx="16" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="142" y="695" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="bold" fill="#38bdf8">
+    Prompt &amp; Story Anchor Context:
+  </text>
+  <foreignObject x="142" y="715" width="740" height="150">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: system-ui, sans-serif; font-size: 15px; color: #cbd5e1; line-height: 1.5;">
+      Photorealistic editorial portrait of software engineer at clean workspace with dual screens displaying Python code.
+    </div>
+  </foreignObject>
+  <text x="512" y="940" font-family="system-ui, sans-serif" font-size="13" fill="#64748b" text-anchor="middle">
+    Automated LinkedIn Visual Generation • Cycle #1aeb3425
+  </text>
+</svg>

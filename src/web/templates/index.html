@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Buffer Content Studio | Multi-Role Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Top App Navigation & Role Switcher -->
+  <header class="header-container">
+    <div class="header-content">
+      <a href="#" class="brand-badge">
+        <div class="brand-logo">B</div>
+        <div class="brand-info">
+          <h1>Buffer LinkedIn Studio</h1>
+          <p>Fullstack • AI Automations • UI/UX</p>
+        </div>
+      </a>
+
+      <!-- Multi-Role Workspace Switcher -->
+      <nav class="role-tabs">
+        <button class="role-tab-btn active" data-role="creative">
+          <span>🎨</span> Creative Studio
+        </button>
+        <button class="role-tab-btn" data-role="client">
+          <span>🏢</span> Client Hub
+        </button>
+        <button class="role-tab-btn" data-role="admin">
+          <span>⚙️</span> Admin Center
+        </button>
+      </nav>
+
+      <!-- System Health Badge -->
+      <div class="header-actions">
+        <div class="status-badge">
+          <span id="pipeline-status-dot" class="status-dot idle"></span>
+          <span id="pipeline-status-text">System Ready</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="app-container">
+
+    <!-- =========================================================================
+         VIEW 1: CREATIVE STUDIO (Content Generation, Editing & Live LinkedIn Feed)
+         ========================================================================= -->
+    <section id="view-creative" class="workspace-view active">
+      <div class="studio-grid">
+
+        <!-- Left Column: Thought Incubator & Form Controls -->
+        <div class="studio-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-title">💡 Prompt & Thought Incubator</div>
+            </div>
+            <span id="post-cycle-badge" class="status-badge" style="font-size: 11px;">New Draft</span>
+          </div>
+
+          <form id="form-generate">
+            <!-- What's On Your Mind Input -->
+            <div class="form-group">
+              <label class="form-label" for="input-mind">
+                <span>💭 What's on your mind today?</span>
+                <span style="font-size: 11px; font-weight: normal; color: var(--color-accent);">Raw experience, tutoring moment, or insight</span>
+              </label>
+              <textarea 
+                id="input-mind" 
+                class="form-textarea" 
+                placeholder="e.g. During office hours yesterday, a student asked me why database indexes matter if their local queries run in 20ms..."
+              ></textarea>
+              
+              <!-- Quick Inspiration Chips -->
+              <div class="idea-chips">
+                <span class="idea-chip" onclick="insertIdea('During backend tutoring, an undergrad spent 3 hours debugging an async loop freezing FastAPI.')">⚡ Async Loop Tutoring Story</span>
+                <span class="idea-chip" onclick="insertIdea('Why adding UI/UX design (Figma) made me design 10x better REST and GraphQL APIs.')">🎨 Figma to Backend APIs</span>
+                <span class="idea-chip" onclick="insertIdea('How we cut AI automation token burn by 70% using state checkpointing.')">🤖 AI Token Checkpointing</span>
+                <span class="idea-chip" onclick="insertIdea('5 years of Python & Node.js taught me why simplicity always beats cleverness.')">🧠 5 Yrs Fullstack Insight</span>
+              </div>
+            </div>
+
+            <!-- Content Pillar & Hook Style -->
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="select-pillar">Content Pillar</label>
+                <select id="select-pillar" class="form-select">
+                  <option value="">Auto-Select (Dynamic Rotation)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="select-hook">Hook Strategy</label>
+                <select id="select-hook" class="form-select">
+                  <option value="">Auto-Select (Smart Strategy)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Model Switcher & Generation Submit -->
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="select-provider">Active LLM Provider</label>
+                <select id="select-provider" class="form-select">
+                  <option value="gemini">Google Gemini (3.6 Flash)</option>
+                  <option value="fireworks">Fireworks AI (LLaMA 3.3 70B)</option>
+                  <option value="qwen">Alibaba Qwen (2.5 72B)</option>
+                  <option value="openai_compatible">OpenAI-Compatible</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="display: flex; align-items: flex-end;">
+                <button type="submit" id="btn-generate-submit" class="btn btn-primary" style="width: 100%;">
+                  ⚡ Generate LinkedIn Post
+                </button>
+              </div>
+            </div>
+
+            <!-- Qwen-Image-3.0 & Standby Photo Section -->
+            <div class="image-gen-section" style="margin-top: 16px; padding: 14px; background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border-subtle); border-radius: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; cursor: pointer; color: #f8fafc;">
+                  <input type="checkbox" id="toggle-generate-image" checked>
+                  <span>🖼️ Generate Matching Image with Qwen-Image-3.0</span>
+                </label>
+                <span class="badge" style="font-size: 10px; background: #6366f1; color: white; padding: 2px 6px; border-radius: 4px;">Alibaba DashScope</span>
+              </div>
+
+              <!-- Standby Photo Indicator & Uploader -->
+              <div id="standby-photo-widget" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-secondary); padding-top: 8px; border-top: 1px dashed var(--border-subtle);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <img id="standby-photo-thumb" src="/media/standby/personal_photo.jpg" alt="Standby Photo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #6366f1; display: none;">
+                  <div>
+                    <div id="standby-photo-status" style="font-weight: 600; color: #38bdf8;">📸 Standby Photo: Checking...</div>
+                    <div id="standby-photo-detail" style="font-size: 11px; color: var(--text-muted);">Used as identity & facial reference for Qwen-Image</div>
+                  </div>
+                </div>
+                <div>
+                  <label for="input-standby-upload" class="btn btn-secondary btn-sm" style="cursor: pointer; margin: 0; padding: 4px 10px; font-size: 11px;">
+                    📁 Upload / Change Photo
+                  </label>
+                  <input type="file" id="input-standby-upload" accept="image/*" style="display: none;">
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <!-- In-Place Markdown & Text Refiner -->
+          <div style="margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+            <div class="form-label">
+              <span>✍️ Live Text Editor & Refiner</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Edits update the live LinkedIn preview in real-time</span>
+            </div>
+            <textarea 
+              id="live-post-editor" 
+              class="form-textarea" 
+              style="min-height: 200px; font-size: 13.5px;"
+              placeholder="Your post content will load here. You can freely edit text, add hashtags, or adjust spacing..."
+            ></textarea>
+
+            <!-- Contextual Image Prompt Editor -->
+            <div id="image-prompt-container" style="margin-top: 14px; padding: 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-subtle); border-radius: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <label class="form-label" style="margin: 0; font-size: 12px; font-weight: 600; color: #c084fc;">
+                  🎨 Qwen-Image-3.0 Visual Prompt (Context-Aware)
+                </label>
+                <button type="button" id="btn-regenerate-image" class="btn btn-secondary btn-sm" style="font-size: 11px; padding: 3px 10px;">
+                  🔄 Regenerate Image Only
+                </button>
+              </div>
+              <textarea 
+                id="live-image-prompt-editor" 
+                class="form-textarea" 
+                style="min-height: 65px; font-size: 12px; resize: vertical;"
+                placeholder="Visual prompt crafted from post context will appear here. You can edit it and click 'Regenerate Image Only'..."
+              ></textarea>
+            </div>
+
+            <!-- Quality & Length Telemetry -->
+            <div class="post-telemetry">
+              <div class="telemetry-item">
+                <span>Characters:</span>
+                <span id="telemetry-char-count" class="telemetry-value">0 / 3000</span>
+              </div>
+              <div class="telemetry-item">
+                <span>Reading Time:</span>
+                <span id="telemetry-read-time" class="telemetry-value">~1 min read</span>
+              </div>
+              <div class="telemetry-item">
+                <span id="telemetry-hook-status">✓ Hook Quality</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Realistic LinkedIn Feed Mockup & Actions -->
+        <div class="studio-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-title">📱 Live LinkedIn Feed Preview</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="toggle-dry-run">
+                <span>Dry-Run Mode</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Realistic LinkedIn Mockup Card -->
+          <div class="linkedin-mockup">
+            <div class="linkedin-header">
+              <div class="linkedin-avatar">OA</div>
+              <div class="linkedin-author-details">
+                <div class="linkedin-author-name">
+                  <span>Oluwafikayo Ajala</span>
+                  <span style="color: #666; font-size: 12px;">• 1st</span>
+                </div>
+                <div class="linkedin-author-headline">
+                  Fullstack Engineer (5 yrs) • UI/UX Designer • Backend Tutor @ University
+                </div>
+                <div class="linkedin-time">
+                  <span>Just now</span> • <span>🌐</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Post Content Body -->
+            <div id="linkedin-mockup-body" class="linkedin-body">
+              <span style="color: #94a3b8; font-style: italic;">
+                Click "Generate LinkedIn Post" or select an idea chip to see the live feed mockup preview here...
+              </span>
+            </div>
+
+            <!-- LinkedIn Attached Image Preview -->
+            <div id="linkedin-mockup-image-container" style="margin: 12px -16px 0 -16px; display: none;">
+              <img id="linkedin-mockup-image" src="" alt="LinkedIn Post Visual" style="width: 100%; max-height: 420px; object-fit: cover; display: block; border-top: 1px solid rgba(255,255,255,0.08); border-bottom: 1px solid rgba(255,255,255,0.08);">
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #94a3b8; padding: 6px 16px 0 16px;">
+                <span>✨ Qwen-Image-3.0 AI Asset</span>
+                <span id="mockup-standby-badge">📸 Standby Reference Active</span>
+                <span id="mockup-cloudinary-badge" style="display: none; color: #38bdf8; font-weight: 600;">☁️ Cloudinary CDN</span>
+              </div>
+            </div>
+
+            <!-- LinkedIn Engagement Action Bar -->
+            <div class="linkedin-social-bar">
+              <div class="social-btn">👍 Like (24)</div>
+              <div class="social-btn">💬 Comment (8)</div>
+              <div class="social-btn">🔁 Repost (3)</div>
+              <div class="social-btn">✈️ Send</div>
+            </div>
+          </div>
+
+
+          <!-- Human-In-The-Loop Action Bar -->
+          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px; margin-top: 20px;">
+            <button id="btn-publish-draft" class="btn btn-linkedin">
+              🚀 Save Draft to Buffer
+            </button>
+            <button id="btn-save-checkpoint" class="btn btn-secondary">
+              💾 Save Checkpoint
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button id="btn-regenerate" class="btn btn-secondary btn-sm" style="flex: 1;">
+              ✨ Regenerate Angle
+            </button>
+            <button id="btn-copy-post" class="btn btn-secondary btn-sm" style="flex: 1;">
+              📋 Copy Post
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         VIEW 2: CLIENT REVIEW & APPROVAL HUB
+         ========================================================================= -->
+    <section id="view-client" class="workspace-view">
+      <div class="client-hero">
+        <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 6px;">🏢 Client & Brand Strategy Hub</h2>
+        <p style="font-size: 14px; color: var(--text-secondary); max-width: 800px;">
+          Review core content pillars, check upcoming drafted insights, and ensure every post aligns with our 5-year fullstack authority, UI/UX craftsmanship, and backend tutoring mentorship.
+        </p>
+
+        <!-- Brand Pillars Grid -->
+        <div id="client-pillars-grid" class="pillar-grid"></div>
+      </div>
+
+      <!-- Pending Approval Station -->
+      <div class="studio-card" style="margin-top: 24px;">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">📋 Content Queue & Approval Status</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="refreshClientData()">🔄 Refresh Queue</button>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          All generated posts are created as <strong>Drafts</strong> inside Buffer, giving your team full human review and schedule timing controls before going live.
+        </p>
+
+        <div style="background: var(--bg-canvas); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">Connected LinkedIn Profile</div>
+            <div style="font-size: 13px; color: var(--text-secondary);">Oluwafikayo Ajala (Channel ID: <code>6a312e1338b55793459ef252</code>)</div>
+          </div>
+          <span class="status-badge" style="color: var(--color-success);">● Connected & Verified</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================================================
+         VIEW 3: ADMIN CONTROL CENTER (Health Matrix, Telemetry, Checkpoint & Logs)
+         ========================================================================= -->
+    <section id="view-admin" class="workspace-view">
+      
+      <!-- System Latency & Provider Health -->
+      <div class="studio-card" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">⚡ Multi-Provider Health & Latency Monitor</div>
+          </div>
+          <span style="font-size: 12px; color: var(--text-secondary);">Real-time connectivity</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+          <div style="background: var(--bg-canvas); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px;">Google Gemini</span>
+              <button class="btn btn-secondary btn-sm" onclick="pingProvider('gemini')">Ping</button>
+            </div>
+            <div id="ping-result-gemini" style="font-size: 13px; color: var(--text-secondary);">gemini-3.6-flash</div>
+          </div>
+
+          <div style="background: var(--bg-canvas); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px;">Fireworks AI</span>
+              <button class="btn btn-secondary btn-sm" onclick="pingProvider('fireworks')">Ping</button>
+            </div>
+            <div id="ping-result-fireworks" style="font-size: 13px; color: var(--text-secondary);">llama-v3p3-70b</div>
+          </div>
+
+          <div style="background: var(--bg-canvas); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px;">Alibaba Qwen</span>
+              <button class="btn btn-secondary btn-sm" onclick="pingProvider('qwen')">Ping</button>
+            </div>
+            <div id="ping-result-qwen" style="font-size: 13px; color: var(--text-secondary);">qwen2.5-72b</div>
+          </div>
+
+          <div style="background: var(--bg-canvas); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px;">Buffer GraphQL</span>
+              <button class="btn btn-secondary btn-sm" onclick="loadBufferProfiles()">Check</button>
+            </div>
+            <div style="font-size: 13px; color: var(--color-success); font-weight: 700;">✓ GraphQL Active</div>
+          </div>
+
+          <div style="background: var(--bg-canvas); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 700; font-size: 14px;">Cloudinary CDN</span>
+              <button class="btn btn-secondary btn-sm" onclick="checkCloudinary()">Check</button>
+            </div>
+            <div id="ping-result-cloudinary" style="font-size: 13px; color: var(--text-secondary);">CDN Image Host</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- State Checkpoint Recovery & Channels -->
+      <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; margin-bottom: 24px;">
+        
+        <!-- Active Checkpoint Recovery Panel -->
+        <div class="studio-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-title">💾 Fault-Tolerance Checkpoint Engine</div>
+            </div>
+            <button id="btn-clear-state" class="btn btn-secondary btn-sm" style="color: var(--color-danger);">
+              Reset Checkpoint
+            </button>
+          </div>
+          <div id="admin-checkpoint-details"></div>
+        </div>
+
+        <!-- Buffer Channels List -->
+        <div class="studio-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-title">🔗 Connected Buffer Channels</div>
+            </div>
+          </div>
+          <div id="admin-channels-list"></div>
+        </div>
+      </div>
+
+      <!-- Historical Audit Log -->
+      <div class="studio-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">📜 Audit History Log (history.jsonl)</div>
+          </div>
+          <span style="font-size: 12px; color: var(--text-secondary);">Append-only log</span>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cycle ID</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+                <th>Buffer Update ID</th>
+                <th>Content Snippet</th>
+              </tr>
+            </thead>
+            <tbody id="admin-history-tbody">
+              <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading history...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

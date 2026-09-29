@@ -1,0 +1,79 @@
+# ==============================================================================
+# Buffer & LLM LinkedIn Automation Configuration
+# ==============================================================================
+
+app:
+  name: "Buffer LinkedIn Content Automation"
+  version: "1.0.0"
+  dry_run: false
+  log_level: "INFO"
+
+# Pipeline & State Management (Fault Tolerance & Checkpointing)
+pipeline:
+  state_file: "data/state.json"
+  history_file: "data/history.jsonl"
+  max_retries: 3
+  retry_backoff_seconds: 2.0
+  auto_resume: true
+
+# Buffer API Settings (Official GraphQL API)
+buffer:
+  api_base_url: "https://api.buffer.com"
+  default_service: "linkedin"
+  draft_mode: true              # Always create as draft for human review in Buffer
+  timeout_seconds: 30
+
+# LLM Provider Agnostic Configuration
+llm:
+  active_provider: "gemini"     # "gemini" | "fireworks" | "qwen" | "openai_compatible"
+  temperature: 0.7
+  max_tokens: 1800
+  top_p: 0.95
+  timeout_seconds: 45
+
+  # Provider specific defaults
+  providers:
+    gemini:
+      default_model: "gemini-3-flash-preview"
+      fallback_model: "gemini-3.8-flash"
+      base_url: "https://generativelanguage.googleapis.com/v1beta"
+      api_key_env: "GEMINI_API_KEY"
+
+    fireworks:
+      default_model: "accounts/fireworks/models/llama-v3p3-70b-instruct"
+      fallback_model: "accounts/fireworks/models/deepseek-v3"
+      base_url: "https://api.fireworks.ai/inference/v1"
+      api_key_env: "FIREWORKS_API_KEY"
+
+    qwen:
+      default_model: "qwen3.6-flash"
+      fallback_model: "qwen3.7-plus"
+      base_url: "https://token-plan.maas.qwencloudapi.com/compatible-mode/v1"
+      api_key_env: "DASHSCOPE_API_KEY"
+      alt_api_key_env: "QWEN_API_KEY"
+      base_url_env: "QWEN_BASE_URL"
+
+    openai_compatible:
+      default_model: "gpt-4o-mini"
+      base_url: "https://api.openai.com/v1"
+      api_key_env: "OPENAI_API_KEY"
+      base_url_env: "CUSTOM_LLM_BASE_URL"
+
+# Image Generation Configuration (Qwen Image 3.0 with Standby Photo)
+image_generation:
+  enabled: true
+  provider: "qwen"
+  model: "wan2.7-image"
+  fallback_model: "wan2.7-image-pro"
+  standby_photo_path: "data/standby/personal_photo.jpg"
+  output_dir: "data/generated_images"
+  api_base_url: "https://token-plan.maas.qwencloudapi.com"
+  timeout_seconds: 60
+  prompt_extend: true
+
+# Cloudinary CDN Image Asset Storage (Permanent Hosting for Buffer Drafts)
+cloudinary:
+  enabled: true
+  cloud_name: ""
+  folder: "linkedin_automation"
+
